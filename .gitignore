@@ -48,3 +48,6 @@ po/*~
 # RStudio Connect folder
 rsconnect/
 .Rproj.user
+
+# personal folder with junk to ignore
+junk2ignore/*
