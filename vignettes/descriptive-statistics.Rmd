@@ -14,10 +14,50 @@ knitr::opts_chunk$set(
 )
 ```
 
+This vignette describes how to calculate basic descriptive statistics of the 1-dimensional data.
+
 ```{r setup}
+suppressPackageStartupMessages(library(tidyverse))
 library(bspm1d)
+
+# import the 3 built-in datasets
+data("simulated_two_local_max")
+data("gait_symmetry")
+data("plantar_arch_angle")
 ```
 
+We will first demonstrate the functions with the dataset `simulated_two_local_max`. This dataset contains 12 simulated 1-dimensional curves (101 data points per curve). The first 6 rows are just white noise while the second 6 rows contain white noise plus two gaussian bursts at positions 25 and 75. Printing the object to the console reveals it is a nested tibble containing 3 columns: `ID` (subject identifier: 1-12), `group` (grouping factor: 1-2) and `Y` (tibbles of size 101 $\times$ 2).
+
+```{r}
+print(simulated_two_local_max)
+```
+
+The 1-dimensional data are nested inside the inner tibbles. Printing the first 10 rows shows they contain two columns: `time` (normalized to 0-100%) and `Y` (the outcome variable).
+
+```{r}
+print(simulated_two_local_max$Y[[1]])
+```
+
+How the user wishes to store the data (`matrix`, `data.frame`, (nested) `tibbles`, ...) is not important. What matters is that the functions in the package require the data be in long format. Below we demonstrate how to do that for nested tibbles.
+
+```{r long-format}
+data_long <- simulated_two_local_max %>%
+  unnest(Y)
+
+# print the first rows
+print(data_long)
+```
+
+The dataset in long format now has 4 columns: `ID`, `group`, `time` and `Y`. This dataset can be used in the plotting functions. The basic plotting functions are `plot_raw1d()` and `plot_meanerr_1d()`. Figure \@ref(fig:plotmeansd) shows the basic functioning of the latter.
+
+```{r plotmeansd, fig.cap="Descriptive statistics for the simulated dataset to illustrate the two-sample t-test.", out.width="100%", fig.asp=.75, fig.align="center"}
+plot_meanerr_1d(data_long, outcome = "Y", 
+                dimension = "time", grp_factors = "group") +
+  labs(x = "Time (%)", y = "Y(t)", color = "Group", fill= "Group",
+       title = "Simulated 1-dimensional data",
+       caption = "Group 2 = smooth white noise\nGroup 1 = smooth white noise + gaussian bursts at t=25 and t=75.") +
+  theme_minimal()
+```
 
 
 
