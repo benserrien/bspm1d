@@ -43,8 +43,6 @@ plot_meanerr_1d <- function(data, outcome = NULL,
                  ymin = ymin, ymax = ymax)) +
       geom_line() +
       geom_ribbon(alpha = .2)
-  } else if (err == "ci") {
-
   }
 
 }
