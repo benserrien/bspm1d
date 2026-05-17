@@ -7,5 +7,5 @@ Serrien, B., Goossens, M., & Baeyens, J. P. (2019). Statistical parametric mappi
 
 Please visit the package website for additional information: ...
 
-To install the package, use `remotes`:
-remotes::install_github("benserrien/bspm1d")
+To install the package from within R, use the remotes package: 
+`remotes::install_github("benserrien/bspm1d")` (the package is not on CRAN).
