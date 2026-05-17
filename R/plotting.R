@@ -20,8 +20,8 @@
 #'
 #' @export
 bspm_plot1d <- function(data, outcome = NULL,
-                            dimension = NULL, grp_factors = NULL,
-                            err = "sd", level = .95) {
+                        dimension = NULL, grp_factors = NULL,
+                        err = "sd", level = .95) {
   stopifnot(
     !is.null(outcome),
     !is.null(dimension)
@@ -29,50 +29,84 @@ bspm_plot1d <- function(data, outcome = NULL,
 
   # SD-error cloud
   if (err == "sd") {
-    summary_stat <- bspm_summarise1d(data, outcome, dimension,
-                                     grp_factors, err = "sd")
-    summary_stat %>%
+    summary_stat <- bspm_summarise1d(
+      data, outcome, dimension, grp_factors, err = "sd"
+    ) %>%
       mutate(
-        ymin = .data[[paste0(outcome,"_m")]] - .data[[paste0(outcome,"_sd")]],
-        ymax = .data[[paste0(outcome,"_m")]] + .data[[paste0(outcome,"_sd")]]
-      ) %>%
-      ggplot(aes(x = .data[[dimension]],
-                 y = .data[[paste0(outcome,"_m")]],
-                 color = factor(.data[[grp_factors]]),
-                 fill = factor(.data[[grp_factors]]),
-                 ymin = ymin, ymax = ymax)) +
+        ymin = .data[[paste0(outcome, "_m")]] - .data[[paste0(outcome, "_sd")]],
+        ymax = .data[[paste0(outcome, "_m")]] + .data[[paste0(outcome, "_sd")]]
+      )
+    # base aesthetics &
+    #   add color/fill only when a grouping factor is supplied
+    base_aes <- aes(
+      x    = .data[[dimension]],
+      y    = .data[[paste0(outcome, "_m")]],
+      ymin = ymin,
+      ymax = ymax
+    )
+    if (!is.null(grp_factors)) {
+      base_aes <- modifyList(base_aes, aes(
+        color = factor(.data[[grp_factors]]),
+        fill  = factor(.data[[grp_factors]])
+      ))
+    }
+    summary_stat %>%
+      ggplot(base_aes) +
       geom_line() +
       geom_ribbon(alpha = .2)
   } else if (err == "se") {
-    summary_stat <- bspm_summarise1d(data, outcome, dimension,
-                                     grp_factors, err = "se")
-    summary_stat %>%
+    summary_stat <- bspm_summarise1d(
+      data, outcome, dimension, grp_factors, err = "se"
+    ) %>%
       mutate(
-        ymin = .data[[paste0(outcome,"_m")]] - .data[[paste0(outcome,"_se")]],
-        ymax = .data[[paste0(outcome,"_m")]] + .data[[paste0(outcome,"_se")]]
-      ) %>%
-      ggplot(aes(x = .data[[dimension]],
-                 y = .data[[paste0(outcome,"_m")]],
-                 color = factor(.data[[grp_factors]]),
-                 fill = factor(.data[[grp_factors]]),
-                 ymin = ymin, ymax = ymax)) +
+        ymin = .data[[paste0(outcome, "_m")]] - .data[[paste0(outcome, "_se")]],
+        ymax = .data[[paste0(outcome, "_m")]] + .data[[paste0(outcome, "_se")]]
+      )
+    # base aesthetics &
+    #   add color/fill only when a grouping factor is supplied
+    base_aes <- aes(
+      x    = .data[[dimension]],
+      y    = .data[[paste0(outcome, "_m")]],
+      ymin = ymin,
+      ymax = ymax
+    )
+    if (!is.null(grp_factors)) {
+      base_aes <- modifyList(base_aes, aes(
+        color = factor(.data[[grp_factors]]),
+        fill  = factor(.data[[grp_factors]])
+      ))
+    }
+    summary_stat %>%
+      ggplot(base_aes) +
       geom_line() +
       geom_ribbon(alpha = .2)
   } else if (err == "ci") {
-    summary_stat <- bspm_summarise1d(data, outcome, dimension,
-                                     grp_factors, err = "ci", level)
-    summary_stat %>%
+    summary_stat <- bspm_summarise1d(
+      data, outcome, dimension, grp_factors, err = "ci", level
+    ) %>%
       mutate(
-        ymin = .data[[paste0(outcome,"_cil")]],
-        ymax = .data[[paste0(outcome,"_ciu")]]
-      ) %>%
-      ggplot(aes(x = .data[[dimension]],
-                 y = .data[[paste0(outcome,"_m")]],
-                 color = factor(.data[[grp_factors]]),
-                 fill = factor(.data[[grp_factors]]),
-                 ymin = ymin, ymax = ymax)) +
+        ymin = .data[[paste0(outcome, "_cil")]],
+        ymax = .data[[paste0(outcome, "_ciu")]]
+      )
+    # base aesthetics &
+    #   add color/fill only when a grouping factor is supplied
+    base_aes <- aes(
+      x    = .data[[dimension]],
+      y    = .data[[paste0(outcome, "_m")]],
+      ymin = ymin,
+      ymax = ymax
+    )
+    if (!is.null(grp_factors)) {
+      base_aes <- modifyList(base_aes, aes(
+        color = factor(.data[[grp_factors]]),
+        fill  = factor(.data[[grp_factors]])
+      ))
+    }
+    summary_stat %>%
+      ggplot(base_aes) +
       geom_line() +
       geom_ribbon(alpha = .2)
-  }
+  } else stop("err should be one of 'sd', 'se' or 'ci'")
 }
+
 
