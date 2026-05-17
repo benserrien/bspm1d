@@ -27,86 +27,68 @@ bspm_plot1d <- function(data, outcome = NULL,
     !is.null(dimension)
   )
 
-  # SD-error cloud
-  if (err == "sd") {
-    summary_stat <- bspm_summarise1d(
-      data, outcome, dimension, grp_factors, err = "sd"
-    ) %>%
-      mutate(
-        ymin = .data[[paste0(outcome, "_m")]] - .data[[paste0(outcome, "_sd")]],
-        ymax = .data[[paste0(outcome, "_m")]] + .data[[paste0(outcome, "_sd")]]
-      )
-    # base aesthetics &
-    #   add color/fill only when a grouping factor is supplied
-    base_aes <- aes(
-      x    = .data[[dimension]],
-      y    = .data[[paste0(outcome, "_m")]],
-      ymin = ymin,
-      ymax = ymax
-    )
-    if (!is.null(grp_factors)) {
-      base_aes <- modifyList(base_aes, aes(
-        color = factor(.data[[grp_factors]]),
-        fill  = factor(.data[[grp_factors]])
-      ))
-    }
-    summary_stat %>%
-      ggplot(base_aes) +
-      geom_line() +
-      geom_ribbon(alpha = .2)
-  } else if (err == "se") {
-    summary_stat <- bspm_summarise1d(
-      data, outcome, dimension, grp_factors, err = "se"
-    ) %>%
-      mutate(
-        ymin = .data[[paste0(outcome, "_m")]] - .data[[paste0(outcome, "_se")]],
-        ymax = .data[[paste0(outcome, "_m")]] + .data[[paste0(outcome, "_se")]]
-      )
-    # base aesthetics &
-    #   add color/fill only when a grouping factor is supplied
-    base_aes <- aes(
-      x    = .data[[dimension]],
-      y    = .data[[paste0(outcome, "_m")]],
-      ymin = ymin,
-      ymax = ymax
-    )
-    if (!is.null(grp_factors)) {
-      base_aes <- modifyList(base_aes, aes(
-        color = factor(.data[[grp_factors]]),
-        fill  = factor(.data[[grp_factors]])
-      ))
-    }
-    summary_stat %>%
-      ggplot(base_aes) +
-      geom_line() +
-      geom_ribbon(alpha = .2)
-  } else if (err == "ci") {
-    summary_stat <- bspm_summarise1d(
-      data, outcome, dimension, grp_factors, err = "ci", level
-    ) %>%
-      mutate(
-        ymin = .data[[paste0(outcome, "_cil")]],
-        ymax = .data[[paste0(outcome, "_ciu")]]
-      )
-    # base aesthetics &
-    #   add color/fill only when a grouping factor is supplied
-    base_aes <- aes(
-      x    = .data[[dimension]],
-      y    = .data[[paste0(outcome, "_m")]],
-      ymin = ymin,
-      ymax = ymax
-    )
-    if (!is.null(grp_factors)) {
-      base_aes <- modifyList(base_aes, aes(
-        color = factor(.data[[grp_factors]]),
-        fill  = factor(.data[[grp_factors]])
-      ))
-    }
-    summary_stat %>%
-      ggplot(base_aes) +
-      geom_line() +
-      geom_ribbon(alpha = .2)
-  } else stop("err should be one of 'sd', 'se' or 'ci'")
+  bspm_summarise1d(data, outcome, dimension, grp_factors, err = err, level) %>%
+    .bspm_add_bounds(outcome, err) %>%
+    ggplot(.bspm_build_aes(outcome, dimension, grp_factors)) +
+    geom_line() +
+    geom_ribbon(alpha = .2)
 }
 
 
+#' .bspm_add_bounds
+#'
+#' @description
+#' Internal helper: appends ymin/ymax columns to a summarised data frame
+#' based on the error type requested.
+#'
+#' @param summary_stat  Data frame returned by bspm_summarise1d().
+#' @param outcome       String, name of the outcome variable.
+#' @param err           One of "sd", "se", or "ci".
+#' @return The input data frame with ymin and ymax columns added.
+#'
+.bspm_add_bounds <- function(summary_stat, outcome, err) {
+  m_col  <- paste0(outcome, "_m")
+  switch(err,
+         sd = mutate(summary_stat,
+                     ymin = .data[[m_col]] - .data[[paste0(outcome, "_sd")]],
+                     ymax = .data[[m_col]] + .data[[paste0(outcome, "_sd")]]
+         ),
+         se = mutate(summary_stat,
+                     ymin = .data[[m_col]] - .data[[paste0(outcome, "_se")]],
+                     ymax = .data[[m_col]] + .data[[paste0(outcome, "_se")]]
+         ),
+         ci = mutate(summary_stat,
+                     ymin = .data[[paste0(outcome, "_cil")]],
+                     ymax = .data[[paste0(outcome, "_ciu")]]
+         ),
+         stop("err should be one of 'sd', 'se' or 'ci'")
+  )
+}
+
+
+#' .bspm_build_aes
+#'
+#' @description
+#' Internal helper: builds the ggplot aes(), optionally adding color/fill
+#' when a grouping factor is supplied.
+#'
+#' @param outcome      String, name of the outcome variable.
+#' @param dimension    String, name of the x-axis variable.
+#' @param grp_factors  String or NULL, name of the grouping variable.
+#' @return An aes() object.
+#'
+.bspm_build_aes <- function(outcome, dimension, grp_factors) {
+  base_aes <- aes(
+    x    = .data[[dimension]],
+    y    = .data[[paste0(outcome, "_m")]],
+    ymin = ymin,
+    ymax = ymax
+  )
+  if (!is.null(grp_factors)) {
+    base_aes <- modifyList(base_aes, aes(
+      color = factor(.data[[grp_factors]]),
+      fill  = factor(.data[[grp_factors]])
+    ))
+  }
+  base_aes
+}
