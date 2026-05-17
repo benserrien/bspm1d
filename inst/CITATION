@@ -1,0 +1,11 @@
+bibentry(
+  bibtype = "Article",
+  title = Statistical parametric mapping of biomechanical one-dimensional data with Bayesian inference.,
+  author = Serrien, B., Goossens, M., & Baeyens, J. P.,
+  journal = International Biomechanics,
+  year = 2019,
+  volume = 6,
+  number = 1,
+  pages = 9–18,
+  doi = https://doi.org/10.1080/23335432.2019.1597643
+)
