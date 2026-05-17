@@ -1,7 +1,7 @@
 # plotting.R
 
 
-#' plot_meanerr_1d
+#' bspm_plot1d
 #'
 #' @description
 #' This function calculates a mean +/- error cloud for the 1-dimensional dataset. The error cloud can be either based on the SD or a confidence interval. Grouping factors can be specified.
@@ -16,8 +16,10 @@
 #' @param err String, specifying the type of error-cloud to calculate (required). Should be either `sd` or `ci`. In case of `ci`, a level of confidence should be defined (default .95).
 #' @param level Numeric, level of confidence for the confidence interval (default .95).
 #'
+#' @return A ggplot figure is returned.
+#'
 #' @export
-plot_meanerr_1d <- function(data, outcome = NULL,
+bspm_plot1d <- function(data, outcome = NULL,
                             dimension = NULL, grp_factors = NULL,
                             err = "sd", level = .95) {
   stopifnot(
@@ -27,11 +29,9 @@ plot_meanerr_1d <- function(data, outcome = NULL,
 
   # SD-error cloud
   if (err == "sd") {
-    data %>%
-      summarise(
-        .by = all_of(c(dimension, grp_factors)),
-        across(all_of(outcome), list(m = mean, sd = sd))
-      ) %>%
+    summary_stat <- bspm_summarise1d(data, outcome, dimension,
+                                     grp_factors, err = "sd")
+    summary_stat %>%
       mutate(
         ymin = .data[[paste0(outcome,"_m")]] - .data[[paste0(outcome,"_sd")]],
         ymax = .data[[paste0(outcome,"_m")]] + .data[[paste0(outcome,"_sd")]]
@@ -43,7 +43,36 @@ plot_meanerr_1d <- function(data, outcome = NULL,
                  ymin = ymin, ymax = ymax)) +
       geom_line() +
       geom_ribbon(alpha = .2)
+  } else if (err == "se") {
+    summary_stat <- bspm_summarise1d(data, outcome, dimension,
+                                     grp_factors, err = "se")
+    summary_stat %>%
+      mutate(
+        ymin = .data[[paste0(outcome,"_m")]] - .data[[paste0(outcome,"_se")]],
+        ymax = .data[[paste0(outcome,"_m")]] + .data[[paste0(outcome,"_se")]]
+      ) %>%
+      ggplot(aes(x = .data[[dimension]],
+                 y = .data[[paste0(outcome,"_m")]],
+                 color = factor(.data[[grp_factors]]),
+                 fill = factor(.data[[grp_factors]]),
+                 ymin = ymin, ymax = ymax)) +
+      geom_line() +
+      geom_ribbon(alpha = .2)
+  } else if (err == "ci") {
+    summary_stat <- bspm_summarise1d(data, outcome, dimension,
+                                     grp_factors, err = "ci", level)
+    summary_stat %>%
+      mutate(
+        ymin = .data[[paste0(outcome,"_cil")]],
+        ymax = .data[[paste0(outcome,"_ciu")]]
+      ) %>%
+      ggplot(aes(x = .data[[dimension]],
+                 y = .data[[paste0(outcome,"_m")]],
+                 color = factor(.data[[grp_factors]]),
+                 fill = factor(.data[[grp_factors]]),
+                 ymin = ymin, ymax = ymax)) +
+      geom_line() +
+      geom_ribbon(alpha = .2)
   }
-
 }
 
