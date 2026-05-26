@@ -22,17 +22,8 @@
 bspm_bfttest <- function(data, group, dimension, outcome, paired,
                          nullInterval = c(-0.20, 0.20),
                          rscale = "medium") {
-  # checking arguments
-  # => move to a separate function
-  stopifnot(
-    !is.null(data1),
-    !is.null(data2),
-    length(data1) >= 3,
-    length(data2) >= 3,
-    ifelse(paired, length(data1) == length(data2), TRUE),
-    length(nullInterval) == 2,
-    rscale %in% c("medium", "wide", "ultrawide")
-  )
+  # checking input arguments
+  check_args()
 
   # point-wise calculations: Bayes-Factor & posterior probability
   bft <- bspm_bf(data1, data2, nullInterval, rscale)
@@ -45,13 +36,28 @@ bspm_bfttest <- function(data, group, dimension, outcome, paired,
   return(ppt)
 }
 
-#' check_data
+#' check_args
 #'
 #' @param data description
 #'
 #' @export
-check_data <- function() {
-
+check_args <- function() {
+  # arguments: data, group, dimension, outcome, paired, nullInterval, rscale
+  stopifnot(
+    is.data.frame(data),
+    sum(c(group, dimension, outcome) %in% colnames(data)) == 3,
+    is.logical(paired),
+    length(paired) == 1,
+    length(nullInterval) == 2,
+    rscale %in% c("medium", "wide", "ultrawide")
+  )
+  # at least 3 observations per group per time point (dimension)
+  data_check <- data %>%
+    summarise(.by = c(dimension, group), N = n()) %>%
+    filter(N < 3)
+  if (nrow(data_check) != 0) {
+    stop("Some groups have less than 3 observations on at least 1 element of the 1-dimensional domain.")
+  }
 }
 
 #' bspm_bf
