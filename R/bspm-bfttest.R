@@ -126,17 +126,13 @@ bspm_bfpp <- function(data, group, dimension, outcome, paired,
                  rscale = rscale),
       ppt = map(bft, .f = bspm_bf2pp)
     )
-
   bf_10 <- sapply(pw$bft, FUN = function(x) as.numeric(as.vector(x)))
   pp_h1 <- sapply(pw$ppt, FUN = function(x) as.numeric(as.vector(x)))[1,]
   pp_h0 <- sapply(pw$ppt, FUN = function(x) as.numeric(as.vector(x)))[2,]
-
-  data.frame(
-    dimension = unique(data[[dimension]]),
-    bf_10,
-    pp_h1,
-    pp_h0
-  )
+  df <- data.frame(bf_10, pp_h1, pp_h0)
+  df %>%
+    mutate(!!dimension := unique(data[[dimension]]),
+           .before = bf_10)
 }
 
 #' bspm_pp2qv
