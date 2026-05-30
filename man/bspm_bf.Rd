@@ -4,7 +4,7 @@
 \alias{bspm_bf}
 \title{bspm_bf}
 \usage{
-bspm_bf(data1, data2, nullInterval, rscale)
+bspm_bf(data1, data2, ...)
 }
 \description{
 A short description...

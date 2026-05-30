@@ -35,44 +35,6 @@ bspm_bfttest <- function(data, group, dimension, outcome, paired,
   return(ppt)
 }
 
-#' check_args
-#'
-#' @param data description
-#'
-#' @export
-check_args <- function() {
-  # arguments: data, group, dimension, outcome, paired, nullInterval, rscale
-  stopifnot(
-    is.data.frame(data),
-    sum(c(group, dimension, outcome) %in% colnames(data)) == 3,
-    is.logical(paired),
-    length(paired) == 1,
-    length(nullInterval) == 2,
-    rscale %in% c("medium", "wide", "ultrawide"),
-    length(unique(data[[group]])) == 2
-  )
-  # the data.frame should not contain missing values
-  stopifnot(
-    sum(is.na(data)) == 0
-  )
-  # at least 3 observations per group per time point (dimension)
-  data_check <- data %>%
-    summarise(.by = c(dimension, group), N = n()) %>%
-    filter(N < 3)
-  if (nrow(data_check) != 0) {
-    stop("Some groups have less than 3 observations on at least 1 element of the 1-dimensional domain.")
-  }
-  # for paired data: same number of observations per group/dimension
-  if (paired) {
-    data_check_paired <- data %>%
-      summarise(.by = c(dimension, group), N = n()) %>%
-      summarise(.by = dimension, N2 = n_distinct(N)) %>%
-      filter(N2 != 1)
-    if (nrow(data_check_paired) != 0) {
-      stop("Paired data require the same number of observations at each element of the 1-dimensional domain.")
-    }
-  }
-}
 
 #' bspm_bf
 #'
