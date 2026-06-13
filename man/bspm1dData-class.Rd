@@ -11,5 +11,7 @@ An S4 class bspm1dData
 
 \describe{
 \item{\code{data}}{An object of class data.frame containing the data in long format.}
+
+\item{\code{dimname}}{Character with the name of the column in \code{data} specifying the 1-dimensional domain.}
 }}
 

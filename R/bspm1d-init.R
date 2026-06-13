@@ -6,14 +6,14 @@
 # -------------------------------------------------------------------------
 # object initialization ---------------------------------------------------
 
-#' bspm1dData
+#' @title bspm1dData
 #'
 #' @description An S4 class bspm1dData
 #'
 #' @slot data An object of class data.frame containing the data in long format.
 #' @slot dimname Character with the name of the column in `data` specifying the 1-dimensional domain.
 #'
-#' @exportClass
+#' @exportClass bspm1dData
 setClass(
   "bspm1dData",
   slots = c(
@@ -32,6 +32,13 @@ setClass(
   )
 )
 
+#' @title bspm1dData
+#' @param data ....
+#' @param dimname ....
+#' @param outcome ....
+#' @param id ....
+#' @param group ....
+#' @export
 bspm1dData <- function(data, dimname, outcome, id, group = NA_character_) {
   new("bspm1dData", data = data,
       dimname = dimname, outcome = outcome, id = id, group = group)
@@ -70,15 +77,20 @@ setValidity(
 # -------------------------------------------------------------------------
 # show/print object to console --------------------------------------------
 
+#' @export
 setGeneric("show", function(object) {
   standardGeneric("show")
 })
+
 setMethod("show", "bspm1dData", function(object) {
   object@data
 })
+
+#' @export
 setGeneric("print", function(object) {
   standardGeneric("print")
 })
+
 setMethod("print", "bspm1dData", function(object) {
   object@data
 })
