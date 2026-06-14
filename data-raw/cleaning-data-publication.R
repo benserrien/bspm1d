@@ -50,10 +50,10 @@ str(Y)
 simulated_two_local_max <- Y %>%
   mutate(
     group  = rep(c("group 1","group 2"), each = 6),
-    simrep = paste0("SIMREP_", sprintf("%02d", 1:12)),
+    rep = paste0("REP_", sprintf("%02d", 1:12)),
     .before = V1
   ) %>%
-  nest(.by = c(simrep, group))
+  nest(.by = c(rep, group), .key = "simulated_data")
 
 
 # -------------------------------------------------------------------------
