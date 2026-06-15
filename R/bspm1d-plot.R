@@ -1,14 +1,14 @@
 # plotting.R
 # several 1-dimensional plots
 
-
-# -------------------------------------------------------------------------
-# plot individual data ----------------------------------------------------
-
 #' @export
 setGeneric("bspm1dPlot", function(object) {
   standardGeneric("bspm1dPlot")
 })
+
+
+# -------------------------------------------------------------------------
+# plot individual data ----------------------------------------------------
 
 setMethod("bspm1dPlot", "bspm1dData", function(object) {
   plot_aes <- .bspm_build_aes1(object)
@@ -31,6 +31,7 @@ setMethod("bspm1dPlot", "bspm1dData", function(object) {
   )
   if (!is.na(object@group)) {
     base_aes <- modifyList(base_aes, aes(
+      group = interaction(.data[[object@group]], .data[[object@id]]),
       color = .data[[object@group]]
     ))
   }
@@ -42,7 +43,9 @@ setMethod("bspm1dPlot", "bspm1dData", function(object) {
 # -------------------------------------------------------------------------
 # plot summary data -------------------------------------------------------
 
+setMethod("bspm1dPlot", "bspm1dSummary", function(object) {
 
+})
 
 #'
 #' #' bspm_plot1d

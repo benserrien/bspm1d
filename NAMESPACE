@@ -3,7 +3,5 @@
 export(bspm1dData)
 export(bspm1dPlot)
 export(bspm_summarise1d)
-export(print)
-export(show)
 exportClasses(bspm1dData)
 import(dplyr)

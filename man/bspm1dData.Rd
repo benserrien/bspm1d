@@ -4,18 +4,18 @@
 \alias{bspm1dData}
 \title{bspm1dData}
 \usage{
-bspm1dData(data, dimname, outcome, id, group = NA_character_)
+bspm1dData(data, dimension, outcome, id, group = NA_character_)
 }
 \arguments{
-\item{data}{....}
+\item{data}{data.frame that contains the 1-dimensional data; the outcome vector mist be a list-column where each row contains a 1xD row vector (D elements in the 1-dimensional domain)}
 
-\item{dimname}{....}
+\item{dimension}{1-dimensional domain in which the outcome is measured, can be a simple vector like 0:100 or can contain units like units::set_units(0:100, "\%")}
 
-\item{outcome}{....}
+\item{outcome}{character with name of the outcome variable}
 
-\item{id}{....}
+\item{id}{ID-variable, must be able to identify paired data}
 
-\item{group}{....}
+\item{group}{optional vector that defines a grouping factor (2-levels)}
 }
 \description{
 bspm1dData
