@@ -1,4 +1,4 @@
-# summary-statistics.R
+# bspm1d-summarise.R
 # functions to calculate summary statistics (mean, SD, (1-alpha)*100% CI)
 
 
