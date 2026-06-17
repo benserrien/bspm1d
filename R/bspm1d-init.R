@@ -21,6 +21,7 @@ setClass(
     dimname = "character",
     outcome = "character",
     id      = "character",
+    paired  = "logical",
     group   = "character"
   ),
   prototype = list(
@@ -28,6 +29,7 @@ setClass(
     dimname = NA_character_,
     outcome = NA_character_,
     id      = NA_character_,
+    paired  = NA,
     group   = NA_character_
   )
 )
@@ -37,9 +39,11 @@ setClass(
 #' @param dimension 1-dimensional domain in which the outcome is measured, can be a simple vector like 0:100 or can contain units like units::set_units(0:100, "%")
 #' @param outcome character with name of the outcome variable
 #' @param id ID-variable, must be able to identify paired data
+#' @param paired logical, must be TRUE when 2 paired observations per `id` are present (1 in each level of `group`)
 #' @param group optional vector that defines a grouping factor (2-levels)
 #' @export
-bspm1dData <- function(data, dimension, outcome, id, group = NA_character_) {
+bspm1dData <- function(data, dimension, outcome,
+                       id, paired = FALSE, group = NA_character_) {
   # check input data
   dimname <- deparse(substitute(dimension))
   dimcheck <- sapply(data[[outcome]], dim)
@@ -61,7 +65,8 @@ bspm1dData <- function(data, dimension, outcome, id, group = NA_character_) {
     unnest(.data[[outcome]])
 
   new("bspm1dData", data = data_long,
-      dimname = dimname, outcome = outcome, id = id, group = group)
+      dimname = dimname, outcome = outcome,
+      id = id, paired = paired, group = group)
 }
 
 
@@ -98,11 +103,52 @@ setValidity(
 # show/print object to console --------------------------------------------
 
 
-setGeneric("print", function(object) {
-  standardGeneric("print")
+#' @export
+setMethod("show", "bspm1dData", function(object) {
+  # print 1-dimensional domain
+  # time [units] = size, head(time)
+  dimname   <- object@dimname
+  has_units <- "units" %in% attributes(object@data[[dimname]])
+  units <- ifelse(has_units,
+                  units(object@data[[dimname]])$numerator,
+                  NA_character_)
+  dimsize <- length(unique(object@data[[dimname]]))
+  dimprint <- object@data %>%
+    select(all_of(dimname)) %>%
+    slice_head(n = 6) %>%
+    pull() %>%
+    paste(collapse = ", ") %>%
+    paste0(", .... [length: ", dimsize,", units: ",units,"]")
+
+  # number of groups (paired?)
+  is_grouped <- !is.na(object@group)
+  ngroups    <- ifelse(is_grouped,
+                       length(unique(object@data[[object@group]])),
+                       1)
+
+  # number of observations per group
+  if (is_grouped) {
+    nobs <- object@data %>%
+      summarise(.by = object@group, N = n_distinct(.data[[object@id]]))
+  } else {
+    nobs <- object@data %>%
+      summarise(N = n_distinct(.data[[object@id]]))
+  }
+
+  # print to console:
+  cat(
+    "################## bspm1dData object ##################\n",
+    dimname, ": ", dimprint, "\n",
+    "groups: K = ", ngroups, " (paired: ", object@paired,")", "\n",
+    "observations: \n",
+    sep = ""
+  )
+  print(nobs)
+  cat("#######################################################")
 })
 
-setMethod("print", "bspm1dData", function(object) {
-  object@data
-})
-
+#' @export
+print.bspm1dData <- function(x, ...) {
+  show(x)
+  invisible(x)
+}

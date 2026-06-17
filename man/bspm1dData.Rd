@@ -4,7 +4,7 @@
 \alias{bspm1dData}
 \title{bspm1dData}
 \usage{
-bspm1dData(data, dimension, outcome, id, group = NA_character_)
+bspm1dData(data, dimension, outcome, id, paired = FALSE, group = NA_character_)
 }
 \arguments{
 \item{data}{data.frame that contains the 1-dimensional data; the outcome vector mist be a list-column where each row contains a 1xD row vector (D elements in the 1-dimensional domain)}
@@ -14,6 +14,8 @@ bspm1dData(data, dimension, outcome, id, group = NA_character_)
 \item{outcome}{character with name of the outcome variable}
 
 \item{id}{ID-variable, must be able to identify paired data}
+
+\item{paired}{logical, must be TRUE when 2 paired observations per \code{id} are present (1 in each level of \code{group})}
 
 \item{group}{optional vector that defines a grouping factor (2-levels)}
 }
