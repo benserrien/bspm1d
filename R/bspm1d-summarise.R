@@ -4,6 +4,24 @@
 
 
 
+# -------------------------------------------------------------------------
+# summary statistics ------------------------------------------------------
+
+#' @title bspm1dSummary
+#'
+#' @description An S4 class bspm1dSummary
+#'
+#' @exportClass bspm1dSummary
+setClass(
+  "bspm1dSummary",
+  slots = c(
+    summary = "data.frame"
+  ),
+  prototype = list(
+    summary = NULL
+  )
+)
+
 
 #' bspm_summarise1d
 #'
