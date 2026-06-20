@@ -52,3 +52,4 @@ rsconnect/
 # personal folder with junk to ignore
 junk2ignore/*
 inst/doc
+logo/*
