@@ -2,7 +2,16 @@
 % Please edit documentation in R/bspm1d-summarise.R
 \name{bspm_summarise1d}
 \alias{bspm_summarise1d}
-\title{bspm_summarise1d}
+\title{setClass(
+"bspm1dSummary",
+slots = c(
+summary = "data.frame"
+),
+prototype = list(
+summary = NULL
+)
+)
+bspm_summarise1d}
 \usage{
 bspm_summarise1d(
   data,

@@ -43,29 +43,29 @@ setMethod("bspm1dPlot", "bspm1dData", function(object) {
 # -------------------------------------------------------------------------
 # plot summary data -------------------------------------------------------
 
-setMethod("bspm1dPlot", "bspm1dSummary", function(object) {
-
-})
+# setMethod("bspm1dPlot", "bspm1dSummary", function(object) {
+#
+# })
 
 #'
 #' #' bspm_plot1d
 #' #'
-#' #' @description
+#@description
 #' #' This function calculates a mean +/- error cloud for the 1-dimensional dataset. The error cloud can be either based on the SD or a confidence interval. Grouping factors can be specified.
 #' #'
-#' #' @import dplyr
-#' #' @import ggplot2
+#@import dplyr
+#'import ggplot2
 #' #'
-#' #' @param data R data.frame containing the individual-level 1-dimensional data in long format.
-#' #' @param outcome String, specifying the name of the outcome variable (required).
-#' #' @param dimension String, specifyng the name of the 1-dimensional domain (required).
-#' #' @param grp_factors String, specifying the name of grouping factors in the data (optional).
-#' #' @param err String, specifying the type of error-cloud to calculate (required). Should be either `sd` or `ci`. In case of `ci`, a level of confidence should be defined (default .95).
-#' #' @param level Numeric, level of confidence for the confidence interval (default .95).
+#'param data R data.frame containing the individual-level 1-dimensional data in long format.
+#@param outcome String, specifying the name of the outcome variable (required).
+#@param dimension String, specifyng the name of the 1-dimensional domain (required).
+# @param grp_factors String, specifying the name of grouping factors in the data (optional).
+#@param err String, specifying the type of error-cloud to calculate (required). Should be either `sd` or `ci`. In case of `ci`, a level of confidence should be defined (default .95).
+#@param level Numeric, level of confidence for the confidence interval (default .95).
 #' #'
-#' #' @return A ggplot figure is returned.
+#@return A ggplot figure is returned.
 #' #'
-#' #' @export
+#' export
 #' bspm_plot1d <- function(data, outcome = NULL,
 #'                         dimension = NULL, grp_factors = NULL,
 #'                         err = "sd", level = .95) {

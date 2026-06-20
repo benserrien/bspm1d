@@ -20,5 +20,5 @@ bspm1dData(data, dimension, outcome, id, paired = FALSE, group = NA_character_)
 \item{group}{optional vector that defines a grouping factor (2-levels)}
 }
 \description{
-bspm1dData
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
 }
