@@ -2,8 +2,8 @@
 
 S3method(print,bspm1dData)
 S3method(print,bspm1dSummary)
-export(bspm1dPlot)
 export(bspm_data)
+export(bspm_plot)
 export(bspm_summarise)
 exportClasses(bspm1dData)
 exportClasses(bspm1dSummary)
