@@ -14,7 +14,6 @@ Gait Symmetry dataset
     \item{\code{gait_cycle}}{a numeric vector, 1:99}
     \item{\code{right_leg}}{a list vector: knee angle of the right leg, time normalized to 0-100\% of the gait cycle}
     \item{\code{left_leg}}{a list vector: knee angle of the left leg, time normalized to 0-100\% of the gait cycle}}
-  }
 }
 \details{
 %%  ~~ If necessary, more details than the __description__ above ~~
