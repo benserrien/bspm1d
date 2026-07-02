@@ -7,53 +7,65 @@
 # -------------------------------------------------------------------------
 # summary statistics ------------------------------------------------------
 
-#@title bspm1dSummary
-#
-#@description An S4 class bspm1dSummary
-#
-#@exportClass bspm1dSummary
-#' setClass(
-#'   "bspm1dSummary",
-#'   slots = c(
-#'     summary = "data.frame"
-#'   ),
-#'   prototype = list(
-#'     summary = NULL
-#'   )
-#' )
+#' @title bspm1dSummary
+#' @description An S4 class bspm1dSummary
+#' @exportClass bspm1dSummary
+setClass(
+  "bspm1dSummary",
+  slots = c(
+    summary = "data.frame",
+    stats   = "character",
+    dimname = "character",
+    outcome = "character",
+    paired  = "logical",
+    group   = "character"
+  ),
+  prototype = list(
+    summary = NULL,
+    stats   = NA_character_,
+    dimname = NA_character_,
+    outcome = NA_character_,
+    paired  = NA,
+    group   = NA_character_
+  )
+)
 
-
-#' bspm_summarise1d
+#' bspm_summarise
 #'
 #' @description
-#' This function calculates a mean +/- error cloud for the 1-dimensional dataset. The error cloud can be either based on the SD or a confidence interval. Grouping factors can be specified to calculate group-specific summaries.
+#' This function calculates a mean +/- error cloud for the 1-dimensional dataset.
 #'
 #' @import dplyr
 #'
-#' @param data R data.frame containing the individual-level 1-dimensional data in long format.
-#' @param outcome String, specifying the name of the outcome variable (required).
-#' @param dimension String, specifyng the name of the 1-dimensional domain (required).
-#' @param grp_factors String, specifying the name of grouping factors in the data (optional).
-#' @param err String, specifying the type of error-cloud to calculate (required). Should be either `sd`, `se` or `ci`. In case of `ci`, a level of confidence should be defined (default .95).
+#' @param object An S4 object of class bspm1dData, result from a call to bspm_data().
+#' @param err String, specifying the type of error-cloud to calculate (required). Should be either `sd`, `se` or `ci`. In case of `ci`, a level of confidence should be defined.
 #' @param level Numeric, level of confidence for the confidence interval (default .95).
 #'
 #' @return Tibble containing summary statistics of the outcome variable at each point in the 1-dimensional domain (stratified per grouping factor). For an outcome variable called `Y`, the summary statistics are called `Y_m` (mean), `Y_sd` (standard deviation of the data), `Y_se` (standard error of the mean), `Y_cil, Y_ciu` (lower and upper limits of the confidence interval).
 #'
 #' @export
-bspm_summarise1d <- function(data, outcome = NULL,
-                             dimension = NULL, grp_factors = NULL,
-                             err = "sd", level = .95) {
-  # checks on the arguments
+bspm_summarise <- function(object, err = "sd", level = .95) {
   stopifnot(
-    !is.null(outcome),
-    !is.null(dimension),
-    err %in% c("sd", "se", "ci")
+    "object should be an S4 object"          = isS4(object),
+    "object should be of class 'bspm1dData'" = "bspm1dData" %in% class(object),
+    "err should be one of sd/se/ci"          = err %in% c("sd", "se", "ci")
   )
-  data %>%
+  data    <- object@data
+  dimname <- object@dimname
+  outcome <- object@outcome
+  id      <- object@id
+  group   <- object@group
+  paired  <- object@paired
+
+  df_summary <- data %>%
     summarise(
-      .by = all_of(c(dimension, grp_factors)),
+      .by = all_of(c(dimname, group)),
       across(all_of(outcome), .bspm_stat_fns(err, level))
     )
+
+  new("bspm1dSummary", summary = df_summary,
+      stats = paste0("mean, ", err), paired = paired,
+      dimname = dimname, outcome = outcome, group = group)
 }
 
 
@@ -70,6 +82,7 @@ bspm_summarise1d <- function(data, outcome = NULL,
 .bspm_stat_fns <- function(err, level) {
   se <- function(x) sd(x) / sqrt(length(x))
 
+  # Claude-AI:
   # force() eagerly evaluates its argument, which pins sign and level as
   # concrete values in the closure's own environment rather than leaving
   # them as promises to be resolved later — at which point dplyr's data-masked
@@ -79,7 +92,8 @@ bspm_summarise1d <- function(data, outcome = NULL,
     force(sign)
     force(level)
     function(x) {
-      mean(x) + sign * qt(1 - (1 - level) / 2, df = length(x) - 1) * se(x)
+      crit_t <- qt(1 - (1 - level) / 2, df = length(x) - 1)
+      mean(x) + sign * crit_t * se(x)
     }
   }
 
@@ -89,4 +103,36 @@ bspm_summarise1d <- function(data, outcome = NULL,
          ci = list(m = mean, cil = ci_bound(-1),
                              ciu = ci_bound(+1))
   )
+}
+
+
+
+# -------------------------------------------------------------------------
+# show/print object to console --------------------------------------------
+
+#' @export
+setMethod("show", "bspm1dSummary", function(object) {
+
+    # number of groups (paired?)
+  is_grouped <- !is.na(object@group)
+  ngroups    <- ifelse(is_grouped,
+                       length(unique(object@summary[[object@group]])),
+                       1)
+
+  # print to console:
+  cat(
+    "################## bspm1dSummary object ##################\n",
+    "summary statistics: ", object@stats, "\n",
+    "groups: K = ", ngroups, " (paired: ", object@paired,")","\n",
+    "first 6 rows of tibble with summary statistics: \n",
+    sep = ""
+  )
+  print(head(object@summary, n = 6))
+  cat("########################################################")
+})
+
+#' @export
+print.bspm1dSummary <- function(x, ...) {
+  show(x)
+  invisible(x)
 }

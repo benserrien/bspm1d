@@ -34,10 +34,9 @@ setClass(
   )
 )
 
-#' @title bspm1dData
+#' @title bspm_data
 #'
-#' @description
-#' `r lifecycle::badge("experimental")`
+#' @description Function to initialize an S4 object of class bspm1dData.
 #'
 #' @param data data.frame that contains the 1-dimensional data; the outcome vector mist be a list-column where each row contains a 1xD row vector (D elements in the 1-dimensional domain)
 #' @param dimension 1-dimensional domain in which the outcome is measured, can be a simple vector like 0:100 or can contain units like units::set_units(0:100, "%")
@@ -47,8 +46,8 @@ setClass(
 #' @param group optional vector that defines a grouping factor (2-levels)
 #'
 #' @export
-bspm1dData <- function(data, dimension, outcome,
-                       id, paired = FALSE, group = NA_character_) {
+bspm_data <- function(data, dimension, outcome,
+                      id, paired = FALSE, group = NA_character_) {
   # check input data
   dimname <- deparse(substitute(dimension))
   dimcheck <- sapply(data[[outcome]], dim)
