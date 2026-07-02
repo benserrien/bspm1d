@@ -1,6 +1,7 @@
 # plotting.R
 # several 1-dimensional plots
 
+#' @include bspm1d-summarise.R
 #' @export
 setGeneric("bspm_plot", function(object) {
   standardGeneric("bspm_plot")

@@ -16,3 +16,8 @@ Config/roxygen2/version: 8.0.0
 Depends: 
     R (>= 3.5)
 LazyData: true
+Collate: 
+    'bspm-bfttest.R'
+    'bspm1d-init.R'
+    'bspm1d-summarise.R'
+    'bspm1d-plot.R'
