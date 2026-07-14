@@ -11,18 +11,48 @@
 #' @exportClass bspm1dHypothesis
 setClass(
   "bspm1dHypothesis",
-  slots = c(),
-  prototype = list()
+  slots = c(
+    prior_rscale = "numeric",
+    nullInterval = "vector"
+  ),
+  prototype = list(
+    prior_rscale = 1,
+    nullInterval = 0
+  )
 )
 
 #' @title bspm_hyp
 #' @description
 #' Function to define null and alternative hypotheses to be tested
-#' @param x ...
+#' @param rscale see `?BayesFactor::ttestBF`, defaults to 1 if not specified (wide default setting in BayesFactor package)
+#' @param nullIntervale see `?BayesFactor::ttestBF`, can be either empty (defaults to testing the point-null hypothesis), a single value which will be interpreted as testing a symmetric nullInterval (e.g. 0.2) or a vector of size two optionally asymmetric (eg. c(-0.1, 0.2))
+#' @importFrom assertthat assert_that
 #' @export
-bspm_hyp <- function() {
+bspm_hyp <- function(prior_rscale, nullInterval = NULL) {
+  assert_that(is.numeric(prior_rscale),
+              msg = "argument prior_rscale should be numeric" )
+  assert_that(length(prior_rscale) == 1,
+              msg = "argument prior_rscale should be a single number")
+  if (!is.null(nullInterval)) {
+    assert_that(is.numeric(nullInterval),
+                msg = "argument nullInterval should be numeric")
+    assert_that(length(nullInterval) %in% c(1, 2),
+                msg = "argument nullInterval should be of length 1 or 2 (or left unspecified)")
+  }
 
+  H0 <- switch(
+    as.character(length(nullInterval)),
+    "0" = 0, # point-null
+    "1" = c(-abs(nullInterval), abs(nullInterval)),
+    "2" = nullInterval
+  )
+
+  new("bspm1dHypothesis", prior_rscale = prior_rscale, nullInterval = H0)
 }
+
+
+bspm_plot
+
 
 
 # -------------------------------------------------------------------------
@@ -65,8 +95,8 @@ setClass(
 #' @export
 bspm_ttest <- function(bspm1dData, bspm1dHypothesis) {
   stopifnot(
-    "object should be an S4 object"          = isS4(object),
-    "object should be of class 'bspm1dData'" = "bspm1dData" %in% class(object)
+    "bspm1dData should be an S4 object"          = isS4(bspm1dData),
+    "bspm1dData should be of class 'bspm1dData'" = "bspm1dData" %in% class(bspm1dData)
   )
 
   new("bspm1dBFttest", ttest = ttest,
