@@ -51,10 +51,6 @@ bspm_hyp <- function(prior_rscale, nullInterval = NULL) {
 }
 
 
-bspm_plot
-
-
-
 # -------------------------------------------------------------------------
 # S4 class for bspm1dBFttest ----------------------------------------------
 
