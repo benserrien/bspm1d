@@ -2,6 +2,7 @@
 # several 1-dimensional plots
 
 #' @include bspm1d-summarise.R
+#' @include bspm1d-bfttest.R
 #' @export
 setGeneric("bspm_plot", function(object) {
   standardGeneric("bspm_plot")
@@ -88,3 +89,10 @@ setMethod("bspm_plot", "bspm1dSummary", function(object) {
 }
 
 
+
+# -------------------------------------------------------------------------
+# plot hypothesis object --------------------------------------------------
+
+setMethod("bspm_plot", "bspm1dHypothesis", function(object) {
+
+})
