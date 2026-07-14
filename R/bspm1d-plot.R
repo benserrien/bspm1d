@@ -94,5 +94,22 @@ setMethod("bspm_plot", "bspm1dSummary", function(object) {
 # plot hypothesis object --------------------------------------------------
 
 setMethod("bspm_plot", "bspm1dHypothesis", function(object) {
-
+  if (length(object@nullInterval) == 1) {
+    plotH0 <- function() geom_vline(xintercept = 0, lty = 1)
+  } else {
+    plotH0 <- function()
+      annotate("rect",
+               xmin = object@nullInterval[1],
+               xmax = object@nullInterval[2],
+               ymin = 0, ymax = Inf, alpha = 0.2, fill = "grey50")
+  }
+  ggplot() +
+    geom_function(fun = dcauchy,
+                  args = list(location = 0, scale = object@prior_rscale)) +
+    plotH0() +
+    xlim(-3, 3) +
+    ylim(c(0, NA)) +
+    theme_minimal() +
+    labs(x = expression(delta), y = "prior PDF",
+         title = "prior & null hypothesis")
 })
