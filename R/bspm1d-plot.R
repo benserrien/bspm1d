@@ -1,4 +1,4 @@
-# plotting.R
+# bspm1d-plot.R
 # several 1-dimensional plots
 
 #' @include bspm1d-summarise.R
