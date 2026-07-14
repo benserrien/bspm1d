@@ -1,6 +1,80 @@
-#' # bspm_bfttest.R
-#' # set of R functions to perform a Bayesian SPM{t}-test for 1-dimensional data
+# bspm1d-bfttest.R
+# set of R functions to perform a Bayesian SPM{t}-test for 1-dimensional data
+
+
+
+# -------------------------------------------------------------------------
+# S4 class for bspm1dHypothesis -------------------------------------------
+
+#' @title bspm1dHypothesis
+#' @description An S4 class bspm1dHypothesis
+#' @exportClass bspm1dHypothesis
+setClass(
+  "bspm1dHypothesis",
+  slots = c(),
+  prototype = list()
+)
+
+#' @title bspm_hyp
+#' @description
+#' Function to define null and alternative hypotheses to be tested
+#' @param x ...
+#' @export
+bspm_hyp <- function() {
+
+}
+
+
+# -------------------------------------------------------------------------
+# S4 class for bspm1dBFttest ----------------------------------------------
+
+#' @title bspm1dBFttest
+#' @description An S4 class bspm1dBFttest
+#' @exportClass bspm1dBFttest
+setClass(
+  "bspm1dBFttest",
+  slots = c(
+    ttest   = "data.frame",
+    dimname = "character",
+    outcome = "character",
+    paired  = "logical",
+    group   = "character"
+  ),
+  prototype = list(
+    ttest   = NULL,
+    dimname = NA_character_,
+    outcome = NA_character_,
+    paired  = NA,
+    group   = NA_character_
+  )
+)
+
+
+#' @title bspm_bfttest
 #'
+#' @description
+#' This function calculates a Bayes-Factor version of the SPM{t}-test for 1-dimensional data (two-sample or paired sample t-test) as described in Serrien et al. (2019).
+#'
+#' @param bspm1dData S4 object of class bspm1dData as created with `bspm_data`
+#' @param bspm1dHypothesis S4 object of class bspm1dHypothesis as created with `bspm_hyp`
+#'
+#' @import BayesFactor
+#'
+#' @references Serrien, B., Goossens, M., & Baeyens, J. P. (2019). Statistical parametric mapping of biomechanical one-dimensional data with Bayesian inference. International Biomechanics, vol. 6 (1), 9-18
+#'
+#' @export
+bspm_ttest <- function(bspm1dData, bspm1dHypothesis) {
+  stopifnot(
+    "object should be an S4 object"          = isS4(object),
+    "object should be of class 'bspm1dData'" = "bspm1dData" %in% class(object)
+  )
+
+  new("bspm1dBFttest", ttest = ttest,
+      dimname = dimname, outcome = outcome,
+      paired = paired, group = group)
+}
+
+
 #' #' bspm_bfttest
 #' #'
 #' #' @description
